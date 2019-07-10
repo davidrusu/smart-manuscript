@@ -25,8 +25,8 @@ import pylab as plt
 import glob
 import os
 from collections import namedtuple
-
-from .writing import InkPage
+from numpy import array
+from .writing import InkPage,Ink
 
 __author__ = "Daniel Vorberg"
 __copyright__ = "Copyright (c) 2017, Daniel Vorberg"
@@ -44,6 +44,8 @@ class Corpus(list):
         _, axes_arr = plt.subplots(rows, columns)
         for axes in axes_arr.reshape(-1):
             transcription, ink = choice(self)
+            ink=Ink(ink)
+            #plt.plot(ink)
             ink.plot_pylab(axes, transcription)
         plt.show()
 

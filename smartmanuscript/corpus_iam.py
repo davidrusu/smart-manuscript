@@ -21,7 +21,7 @@
 """
 
 
-from tensorflow.python.platform.app import flags
+#from tensorflow.python.platform.app import flags
 import pylab as plt
 import os
 import glob
@@ -35,8 +35,8 @@ __copyright__ = "Copyright (c) 2017, Daniel Vorberg"
 __license__ = "GPL"
 
 
-flags.DEFINE_string("iam_on_do_path", "data/IAMonDo-db-1.0",
-                    "path to IAMonDo-db-1.0 folder (unzipped)")
+#flags.DEFINE_string("iam_on_do_path", "data/IAMonDo-db-1.0",
+#                    "path to IAMonDo-db-1.0 folder (unzipped)")
 
 
 class IAMonDo(InkML):
@@ -161,7 +161,7 @@ def main():
     """ load the full IAMonDo database and show random lines and transcription
     """
 
-    words, lines = _import_set(flags.FLAGS.iam_on_do_path, "0.set", max_files=10)
+    words, lines = _import_set("../data/IAMonDo-db-1.0", "0.set", max_files=10)
     while True:
         lines.plot_sample()
 
