@@ -46,6 +46,7 @@ class IAMonDo(InkML):
     TRANSCRIPTION = "transcription"
     TYPE = "type"
     CORRECTION = "Correction"
+    DRAWING ="Drawing"
 
     @staticmethod
     def condition(element, type_):
@@ -78,14 +79,17 @@ class IAMonDo(InkML):
         def condition(elem):
             return self.condition(elem, type_)
         for textline in self._root.search(condition):
-            try:
-                transcription = textline.annotation[self.TRANSCRIPTION]
-            except KeyError:
-                print(f'Warning: transcription for file {self.filename} not found, skipping')
-                continue
-            yield TranscriptedStrokes(
-                transcription=transcription,
-                strokes=self.ink(textline._trace_data_refs()))
+            if type_ != self.DRAWING:
+                try:
+                    transcription = textline.annotation[self.TRANSCRIPTION]
+                except KeyError:
+                    print(f'Warning: transcription for file {self.filename} not found, skipping')
+                    continue
+                yield TranscriptedStrokes(
+                    transcription=transcription,
+                    strokes=self.ink(textline._trace_data_refs()))
+            else:
+                yield self.ink(textline._trace_data_refs())
 
     @property
     def pagesize(self):
@@ -130,6 +134,7 @@ def _import_set(iam_on_db_path, set_filename, max_files=None):
 
     corpus_word = Corpus()
     corpus_line = Corpus()
+    corpus_drawing = Corpus()
     num_files = 0
     filenames = list(files_in_set(iam_on_db_path, set_filename))
     for i, inkml_filename in enumerate(filenames):
@@ -145,6 +150,10 @@ def _import_set(iam_on_db_path, set_filename, max_files=None):
                                 for segment
                                 in inkml.get_segments(IAMonDo.TEXTLINE))
             corpus_line.extend(new_lines)
+            new_drawings = Corpus(segment
+                                for segment
+                                in inkml.get_segments(IAMonDo.DRAWING))
+            corpus_drawing.extend(new_drawings)
         except FileNotFoundError:
             print("file {} not found {:20}".format(inkml_filename, ""))
         if i == max_files:
@@ -154,14 +163,14 @@ def _import_set(iam_on_db_path, set_filename, max_files=None):
           "from {} inkml-files ".format(len(corpus_word), len(corpus_line),
                                         num_files))
 
-    return corpus_word, corpus_line
+    return corpus_word, corpus_line, corpus_drawing
 
 
 def main():
     """ load the full IAMonDo database and show random lines and transcription
     """
 
-    words, lines = _import_set("../data/IAMonDo-db-1.0", "0.set", max_files=10)
+    words, lines,drawings = _import_set("../data/IAMonDo-db-1.0", "0.set", max_files=10)
     while True:
         lines.plot_sample()
 
