@@ -159,8 +159,8 @@ def _import_set(iam_on_db_path, set_filename, max_files=None):
         if i == max_files:
             break
 
-    print(" {} words and {} textlines have been imported "
-          "from {} inkml-files ".format(len(corpus_word), len(corpus_line),
+    print(" {} words, {} textlines and {} drawings have been imported "
+          "from {} inkml-files ".format(len(corpus_word), len(corpus_line), len(corpus_drawing),
                                         num_files))
 
     return corpus_word, corpus_line, corpus_drawing
