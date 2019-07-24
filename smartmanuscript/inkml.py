@@ -240,16 +240,23 @@ class TraceParser:
         # TODO(daniel): check if last point is valid
         channel_x = Channel()
         channel_y = Channel()
+        channel_t = Channel()
+        channel_p = Channel()
         for point in points:
             number = r"([+-]\s*)?([0-9]*[.])?[0-9]+"
             value = r"(\"|'|!)?\s*{}".format(number)
             rule = r"(?P<x>{0})(?P<y>{0}).*".format(value)
-            match = re.match(rule, point)
+            rule2 = r"(?P<x>{0})(?P<y>{0})(?P<t>{0})(?P<p>{0}).*".format(value)
+            match = re.match(rule2, point)
             channel_x.append(match.group('x'))
             channel_y.append(match.group('y'))
+            channel_t.append(match.group('t'))
+            channel_p.append(match.group('p'))
 
         stroke = np.array([channel_x.get_data(),
-                           channel_y.get_data()]).transpose()
+                           channel_y.get_data(),
+                          channel_t.get_data(),
+                           channel_p.get_data(),]).transpose()
         return stroke
 
 parse = TraceParser()
