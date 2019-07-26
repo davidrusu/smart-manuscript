@@ -1,6 +1,10 @@
-*.pyc
+#don't push the data except the scaled one
 data/*
+!data/scaled*
 !data/.gitkeep
+
+*.pyc
+
 __pycache__/
 graphs/*
 !graphs/.gitkeep
