@@ -53,6 +53,8 @@ class Ink:
         """ create Ink from strokes, consider use Ink.from_corrupted_stroke()
         """
         #strokes = deepcopy(strokes)
+
+        print("Ink")
         if strokes is not None and strokes != []:
             self._concatenated_strokes = np.concatenate(strokes)
             sections = np.cumsum([len(s) for s in strokes])[:-1]
@@ -138,6 +140,7 @@ class Ink:
     @cached_property
     def length(self):
         def stroke_length(stroke):
+            # print(stroke)
             x = stroke[:, 0]
             y = stroke[:, 1]
             dist = np.sqrt((x[:-1] - x[1:])**2 + (y[:-1] - y[1:])**2)
@@ -195,9 +198,17 @@ class Ink:
             self.strokes + other.strokes)
 
     def __rmatmul__(self, other):
+        # print(other)
+        # input()
         new_concatenated_strokes = other @ self.concatenated_strokes
+        # print(new_concatenated_strokes)
+        # input()
         sections = np.cumsum([len(s) for s in self])[:-1]
+        # print(sections)
+        # input()
         new_strokes = np.split(new_concatenated_strokes, sections)
+        # print(new_strokes)
+        # input()
         return type(self)(new_strokes, is_uncorrupted=self.is_uncorrupted)
 
 # def gauss(x, mu, sigma):
@@ -239,6 +250,7 @@ class InkPage(Ink):
 
     def __init__(self, strokes, page_size=None,
                  is_uncorrupted=False):
+        print("InkPage")
         super().__init__(strokes, is_uncorrupted=is_uncorrupted)
         self.page_size = page_size
 
@@ -246,6 +258,7 @@ class InkPage(Ink):
     def lines(self, min_seperation=None):  # TODO(daniel): remove min_seperation
         """ split the ink in several lines
         """
+        print("Lines")
         lines = []
         min_x, max_x, _, _ = self.boundary_box
         if min_seperation is None:
@@ -255,7 +268,13 @@ class InkPage(Ink):
                                    min_seperation > stroke[0, 0])):
                 lines.append([])
             lines[-1].append(stroke)
-        return [Ink.from_corrupted_stroke(line) for line in lines]
+
+        inks = []
+        for l in lines:
+            # print("Line", l)
+            inks.append(Ink.from_corrupted_stroke(l))
+
+        return inks
 
 class NormalizationWarning(Warning):
     pass
@@ -273,6 +292,7 @@ class InkNormalization:
             steps = OrderedDict(original=(ink, transformation))
         for normalization in normalizations:
             ink, new_transformation = normalization(ink)
+            print(normalization.__name__)
             transformation = new_transformation @ transformation
             if ret_steps:
                 steps[normalization.__name__] = ink, transformation
@@ -292,7 +312,7 @@ class InkNormalization:
             normalized_skew_and_mean = self.normalized_skew_and_mean
         return [normalized_skew_and_mean,
                 self.normalized_skew_and_mean,
-                self.normalized_slant,
+                # self.normalized_slant,
                 self.normalized_baseline,
                 self.normalized_width,
                 self.normalized_left]
@@ -1031,10 +1051,14 @@ def strokes_to_features(
         skew_is_horizontal=False,
         resort=False,
         ret_transformation=False):
+    print("strokes_to_features")
     ink = Ink.from_corrupted_stroke(strokes, skew_is_horizontal)
+    
     if normalize:
+        print("normalizing")
         ink, transformation = normalized(
             ink, skew_is_horizontal=skew_is_horizontal)
+
     features = InkFeatures.ink_to_features(ink)
     if not ret_transformation:
         return features

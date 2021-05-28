@@ -77,9 +77,8 @@ class Reader:
             ink (nested list of arrays[N,2]): the trajectories
         """
 
-
         def features():
-            return (strokes_to_features(ink.strokes) for ink in inks)
+            return (strokes_to_features(ink) for ink in inks)
         with self.graph.as_default():
             dataset = get_dataset_from_features(features, batch_size=len(inks))
             *inputs, _ = dataset.make_one_shot_iterator().get_next()
@@ -104,7 +103,11 @@ class Reader:
             ink (nested list of arrays[N,2]): the trajectories
         """
 
+        print("recognize_line")
+
         features = strokes_to_features(ink)
+        # print("features", features)
+
         feed_dict = {self.inputs.values: np.expand_dims(features, 0),
                      self.inputs.length: np.array([len(features)])}
 
@@ -121,6 +124,7 @@ class Reader:
             self, stroke_page):
         """ recognize a full page
         """
+        print("recognizing_page")
         ink_page = InkPage(stroke_page)
         #lines, *_ = self.recognize(ink_page.lines)
         lines = [self.recognize_line(ink_line.strokes)[0]

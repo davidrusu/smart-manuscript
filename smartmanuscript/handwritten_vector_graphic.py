@@ -117,7 +117,7 @@ def _pdf_to_svg_tmp(pdf_path):
     svg_basename = pdf_basename.replace(".pdf", ".svg")
     svg_path = "/tmp/" + svg_basename
     # subprocess.call(["inkscape", "-l", svg_path, pdf_path])  (see TODO above)
-    subprocess.call(["/usr/bin/pdftocairo", "-svg", pdf_path, svg_path])
+    subprocess.call(["pdftocairo", "-svg", pdf_path, svg_path])
     return svg_path
 
 

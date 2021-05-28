@@ -39,6 +39,7 @@ try:
 except ImportError:
     XINPUT_IS_IMPORTED = False
 
+from .writing import Ink
 from .reader import Reader
 
 
@@ -191,8 +192,7 @@ class HandwrittenInput(Gtk.Window):
             stroke[:, 1] = - stroke[:, 1] + 200
             stroke = stroke / 100
             strokes.append(stroke)
-        predictions = self.recognizer.recognize(
-            strokes, num_proposals=self._num_proposals)
+        predictions = self.recognizer.recognize([Ink(strokes)])
         for button, prediction in zip(self.buttons, predictions):
             button.set_label(prediction)
             button.show()
